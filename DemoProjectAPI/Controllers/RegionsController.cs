@@ -1,6 +1,7 @@
 ﻿using DemoProjectAPI.Data;
 using DemoProjectAPI.Models.Domain;
 using DemoProjectAPI.Models.DTO;
+using DemoProjectAPI.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,16 +13,18 @@ namespace DemoProjectAPI.Controllers
     public class RegionsController : ControllerBase
     {
         private readonly WalksDbContext _context;
-        public RegionsController(WalksDbContext dbContext)
+        private readonly IRegionRepository _regionRepository;
+        public RegionsController(WalksDbContext dbContext, IRegionRepository _regionRepository)
         {
             this._context = dbContext;
+            this._regionRepository = _regionRepository;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             //Get the data from Database - Domain Models
-            var regions = await _context.Regions.ToListAsync();
+            var regions = await _regionRepository.GetAllAsync();
 
             //Map the Domain Models to DTO
             var regionsDto = new List<RegionDto>();

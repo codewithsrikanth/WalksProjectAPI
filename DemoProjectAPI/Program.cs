@@ -1,4 +1,5 @@
 using DemoProjectAPI.Data;
+using DemoProjectAPI.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +16,7 @@ builder.Services.AddDbContext<WalksDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("WalksConnectionString"));
 });
+builder.Services.AddScoped<IRegionRepository, SQLRegionRepository>();
 
 var app = builder.Build();
 
