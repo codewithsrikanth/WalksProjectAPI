@@ -1,4 +1,5 @@
 using DemoProjectAPI.Data;
+using DemoProjectAPI.Mappings;
 using DemoProjectAPI.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +18,8 @@ builder.Services.AddDbContext<WalksDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("WalksConnectionString"));
 });
 builder.Services.AddScoped<IRegionRepository, SQLRegionRepository>();
+
+builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));
 
 var app = builder.Build();
 
