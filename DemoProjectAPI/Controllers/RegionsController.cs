@@ -48,7 +48,8 @@ namespace DemoProjectAPI.Controllers
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
             //var region = _context.Regions.Find(id);
-            var regionDomain =await _context.Regions.FirstOrDefaultAsync(x => x.Id == id);
+            //var regionDomain =await _context.Regions.FirstOrDefaultAsync(x => x.Id == id);
+            var regionDomain = await _regionRepository.GetByIdAsync(id);
             if(regionDomain == null)
             {
                 return NotFound();
@@ -80,8 +81,10 @@ namespace DemoProjectAPI.Controllers
             };
 
             //Use Domain Model and Store the data
-            await _context.Regions.AddAsync(regionModel);
-            await _context.SaveChangesAsync();
+            //await _context.Regions.AddAsync(regionModel);
+            //await _context.SaveChangesAsync();
+
+            regionModel = await _regionRepository.CreateAsync(regionModel);
 
             var regionDto = new RegionDto()
             {
@@ -99,16 +102,25 @@ namespace DemoProjectAPI.Controllers
         [Route("{id:guid}")]
         public async Task<IActionResult> Update([FromRoute]Guid id, [FromBody]UpdateRegionRequestDto updateRegionRequestDto)
         {
-            var regionDomainModel =await  _context.Regions.FindAsync(id);
+            //var regionDomainModel =await  _context.Regions.FindAsync(id);
+            Region? regionDomainModel = new Region()
+            {
+                Code= updateRegionRequestDto.Code,
+                Name = updateRegionRequestDto.Name,
+                RegionImageUrl = updateRegionRequestDto.RegionImageUrl,
+            };
+
+            regionDomainModel =  await _regionRepository.UpdateAsync(id, regionDomainModel);
+
             if (regionDomainModel == null)
                 return NotFound();
             
-            //Map the DTO to Domain Model
-            regionDomainModel.Code = updateRegionRequestDto.Code;
-            regionDomainModel.RegionImageUrl = updateRegionRequestDto.RegionImageUrl;
-            regionDomainModel.Name = updateRegionRequestDto.Name;
+           // //Map the DTO to Domain Model
+           // regionDomainModel.Code = updateRegionRequestDto.Code;
+           // regionDomainModel.RegionImageUrl = updateRegionRequestDto.RegionImageUrl;
+           // regionDomainModel.Name = updateRegionRequestDto.Name;
             
-           await _context.SaveChangesAsync();
+           //await _context.SaveChangesAsync();
 
             var regionDto = new RegionDto()
             {
@@ -124,11 +136,12 @@ namespace DemoProjectAPI.Controllers
         [Route("{id:guid}")]
         public async Task<IActionResult> Delete([FromRoute]Guid id)
         {
-            var regionDomain =await _context.Regions.FindAsync(id);
+            //var regionDomain =await _context.Regions.FindAsync(id);
+            var regionDomain = await _regionRepository.DeleteAsync(id);
             if(regionDomain == null)
                 return NotFound();
-            _context.Regions.Remove(regionDomain);
-            await _context.SaveChangesAsync();
+            //_context.Regions.Remove(regionDomain);
+            //await _context.SaveChangesAsync();
 
             var regionDto = new RegionDto()
             {
