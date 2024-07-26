@@ -1,11 +1,9 @@
 ﻿using AutoMapper;
-using DemoProjectAPI.Data;
+using DemoProjectAPI.CustomFilters;
 using DemoProjectAPI.Models.Domain;
 using DemoProjectAPI.Models.DTO;
 using DemoProjectAPI.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 
 namespace DemoProjectAPI.Controllers
 {
@@ -76,39 +74,29 @@ namespace DemoProjectAPI.Controllers
 
 
         [HttpPost]
+        [ValidationState]
         public async Task<IActionResult> Create([FromBody] AddRegionRequestDto addRegionRequestDto)
-        {            
-            if(ModelState.IsValid)
-            {
-                var regionModel = _mapper.Map<Region>(addRegionRequestDto);
-                regionModel = await _regionRepository.CreateAsync(regionModel);
-                var regionDto = _mapper.Map<RegionDto>(regionModel);
-                return CreatedAtAction(nameof(GetById), new { id = regionDto.Id }, regionDto);
-            }
-            else
-            {
-                return BadRequest(ModelState);
-            }
+        {
+            var regionModel = _mapper.Map<Region>(addRegionRequestDto);
+            regionModel = await _regionRepository.CreateAsync(regionModel);
+            var regionDto = _mapper.Map<RegionDto>(regionModel);
+            return CreatedAtAction(nameof(GetById), new { id = regionDto.Id }, regionDto);
         }
 
 
         [HttpPut]
         [Route("{id:guid}")]
+        [ValidationState]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateRegionRequestDto updateRegionRequestDto)
         {
-            if (ModelState.IsValid)
-            {
+            
                 var regionDomainModel = _mapper.Map<Region>(updateRegionRequestDto);
                 regionDomainModel = await _regionRepository.UpdateAsync(id, regionDomainModel);
                 if (regionDomainModel == null)
                     return NotFound();
                 var regionDto = _mapper.Map<RegionDto>(regionDomainModel);
                 return Ok(regionDto);
-            }
-            else
-            {
-                return BadRequest(ModelState);
-            }           
+            
         }
 
         [HttpDelete]
