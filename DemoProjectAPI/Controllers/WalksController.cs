@@ -21,9 +21,17 @@ namespace DemoProjectAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] AddWalksRequestDto addWalksRequestDto)
         {
-            var walksDomainModel = mapper.Map<Walks>(addWalksRequestDto);
-            await repository.CreateAsync(walksDomainModel);
-            return Ok(mapper.Map<WalksDto>(walksDomainModel));
+            if (ModelState.IsValid)
+            {
+                var walksDomainModel = mapper.Map<Walks>(addWalksRequestDto);
+                await repository.CreateAsync(walksDomainModel);
+                return Ok(mapper.Map<WalksDto>(walksDomainModel));
+            }
+            else
+            {
+                return BadRequest(ModelState);
+            }
+           
         }
         [HttpGet]
         public async Task<IActionResult> GetAll()
@@ -45,13 +53,17 @@ namespace DemoProjectAPI.Controllers
         [Route("{id:Guid}")]
         public async Task<IActionResult> Update([FromRoute] Guid id, UpdateWalksRequestDto updateWalksRequestDto)
         {
-            var walkDomainModel = mapper.Map<Walks>(updateWalksRequestDto);
-            walkDomainModel = await repository.UpdateAsync(id, walkDomainModel);
-            if (walkDomainModel == null)
-            { 
-                return NotFound(); 
+           if(ModelState.IsValid)
+            {
+                var walkDomainModel = mapper.Map<Walks>(updateWalksRequestDto);
+                walkDomainModel = await repository.UpdateAsync(id, walkDomainModel);
+                if (walkDomainModel == null)
+                {
+                    return NotFound();
+                }
+                return Ok(mapper.Map<WalksDto>(walkDomainModel));
             }
-            return Ok(mapper.Map<WalksDto>(walkDomainModel));
+           return BadRequest(ModelState);
         }
 
         [HttpDelete]
