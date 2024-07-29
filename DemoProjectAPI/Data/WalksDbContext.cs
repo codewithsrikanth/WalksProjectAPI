@@ -5,7 +5,7 @@ namespace DemoProjectAPI.Data
 {
     public class WalksDbContext : DbContext
     {
-        public WalksDbContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
+        public WalksDbContext(DbContextOptions<WalksDbContext> dbContextOptions) : base(dbContextOptions)
         {
         }
         public DbSet<Region> Regions { get; set; }
