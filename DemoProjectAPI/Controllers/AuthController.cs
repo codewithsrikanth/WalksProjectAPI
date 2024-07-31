@@ -1,4 +1,5 @@
 ﻿using DemoProjectAPI.Models.DTO;
+using DemoProjectAPI.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,9 +11,12 @@ namespace DemoProjectAPI.Controllers
     public class AuthController : ControllerBase
     {
         private readonly UserManager<IdentityUser> _userManager;
-        public AuthController(UserManager<IdentityUser> _userManager)
+        private readonly ITokenRepository _tokenRepository;
+        public AuthController(UserManager<IdentityUser> _userManager, ITokenRepository tokenRepository)
         {
             this._userManager = _userManager;
+            _tokenRepository = tokenRepository;
+
         }
 
 
@@ -53,11 +57,12 @@ namespace DemoProjectAPI.Controllers
                 var checkPwd = await _userManager.CheckPasswordAsync(user, loginRequestDto.Password);
                 if(checkPwd == true)
                 {
-                    //Token
-
-
-
-                    return Ok();
+                    var roles = await _userManager.GetRolesAsync(user);
+                    if(roles != null)
+                    {
+                        string jwtToken = _tokenRepository.CreateJWTToken(user, roles.ToList());
+                        return Ok(jwtToken);
+                    }
                 }
             }
 
